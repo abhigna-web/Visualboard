@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: colloidboard-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  server:
+    build: ./backend
+    container_name: colloidboard-server
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/collabboard
+      - JWT_SECRET=collabboard_super_secret_key_2024
+      - CLIENT_URL=http://localhost:80
+    depends_on:
+      - mongodb
+
+  client:
+    build: ./frontend
+    container_name: colloidboard-client
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+
+volumes:
+  mongodb_data:
